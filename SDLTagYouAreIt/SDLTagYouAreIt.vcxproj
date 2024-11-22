@@ -135,13 +135,50 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Asset.cpp" />
+    <ClCompile Include="AssetController.cpp" />
+    <ClCompile Include="AudioController.cpp" />
+    <ClCompile Include="FileController.cpp" />
+    <ClCompile Include="GameController.cpp" />
+    <ClCompile Include="InputController.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderTarget.cpp" />
+    <ClCompile Include="Resource.cpp" />
     <ClCompile Include="SDLTagYouAreIt.cpp" />
+    <ClCompile Include="Song.cpp" />
+    <ClCompile Include="SoundEffect.cpp" />
+    <ClCompile Include="SpriteAnim.cpp" />
+    <ClCompile Include="SpriteSheet.cpp" />
     <ClCompile Include="StackAllocator.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TGAReader.cpp" />
+    <ClCompile Include="TTFont.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Asset.h" />
+    <ClInclude Include="AssetController.h" />
+    <ClInclude Include="AudioController.h" />
+    <ClInclude Include="BasicStructs.h" />
+    <ClInclude Include="FileController.h" />
+    <ClInclude Include="GameController.h" />
+    <ClInclude Include="InputController.h" />
+    <ClInclude Include="Keyboard.h" />
     <ClInclude Include="ObjectPool1.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderTarget.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Serializable.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="Song.h" />
+    <ClInclude Include="SoundEffect.h" />
+    <ClInclude Include="SpriteAnim.h" />
+    <ClInclude Include="SpriteSheet.h" />
     <ClInclude Include="StackAllocator.h" />
     <ClInclude Include="StandardIncludes.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TGAReader.h" />
+    <ClInclude Include="TTFont.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
