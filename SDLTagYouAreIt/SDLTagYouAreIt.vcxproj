@@ -142,6 +142,10 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="NPCWarrior.cpp" />
+    <ClCompile Include="NPCWarriorImpl.cpp" />
+    <ClCompile Include="PlayerWarrior.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Resource.cpp" />
@@ -154,6 +158,7 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TGAReader.cpp" />
     <ClCompile Include="TTFont.cpp" />
+    <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Asset.h" />
@@ -164,7 +169,11 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
     <ClInclude Include="GameController.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="NPCWarrior.h" />
+    <ClInclude Include="NPCWarriorImpl.h" />
     <ClInclude Include="ObjectPool1.h" />
+    <ClInclude Include="PlayerWarrior.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="Resource.h" />
@@ -179,6 +188,7 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TGAReader.h" />
     <ClInclude Include="TTFont.h" />
+    <ClInclude Include="Utility.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

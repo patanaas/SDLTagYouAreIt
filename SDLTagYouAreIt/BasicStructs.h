@@ -7,6 +7,22 @@
 typedef unsigned char byte;
 #endif // !WIN_32
 
+#include "SpriteSheet.h"
+
+struct Warrior {
+	float x;
+	float y;
+	float speed;
+	float direction;
+	float animationSpeed;
+	bool isDead;
+	bool isAnimatingDeath;
+	float deathTimer;
+	SpriteSheet* animation;
+
+	Warrior(float x = 0, float y = 0) : x(x), y(y) {}
+};
+
 struct Color
 {
 	Color(byte _r, byte _g, byte _b, byte _a)
@@ -26,14 +42,23 @@ struct Color
 // Code for Rendering Primitives
 struct Point
 {
-	Point(unsigned int _x, unsigned int _y)
+	/*Point(unsigned int _x, unsigned int _y)
 	{
 		X = _x;
 		Y = _y;
 	}
 
 	unsigned int X;
+	unsigned int Y;*/
+
+	Point() : X(0), Y(0) {}  // Default constructor initializing X and Y to 0
+	Point(unsigned int _x, unsigned int _y) : X(_x), Y(_y) {}  // Parameterized constructor
+
+	unsigned int X;
 	unsigned int Y;
+
+	/*Point() : X(0), Y(0) {}
+	Point(float xPos, float yPos) : X(xPos), Y(yPos) {}*/
 };
 
 struct Rect
