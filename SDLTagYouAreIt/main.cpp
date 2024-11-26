@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <algorithm> // For std::min and std::max
 #include "Level.h"
 
 const int SCREEN_WIDTH = 1920;
@@ -75,13 +76,13 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                 case SDLK_i: // Increase NPC speed
-                    for (auto& npc : level.getNPCs()) {
-                        npc.setSpeed(std::min(npc.getSpeed() + 10, 60));
+                    for (auto npc : level.getNPCs()) {
+                        npc->setSpeed(std::min(npc->getSpeed() + 10, 60));
                     }
                     break;
                 case SDLK_d: // Decrease NPC speed
-                    for (auto& npc : level.getNPCs()) {
-                        npc.setSpeed(std::max(npc.getSpeed() - 10, 0));
+                    for (auto npc : level.getNPCs()) {
+                        npc->setSpeed(std::max(npc->getSpeed() - 10, 0));
                     }
                     break;
                 case SDLK_s: // Save level
@@ -90,7 +91,6 @@ int main(int argc, char* argv[]) {
                 case SDLK_l: // Load level
                     level.load("level.bin");
                     break;
-
                 case SDLK_ESCAPE: // Quit game
                     running = false;
                     break;
@@ -100,19 +100,16 @@ int main(int argc, char* argv[]) {
             level.getPlayer()->handleEvent(event);
         }
 
-        // Update level
         level.update(FRAME_DELAY / 1000.0f);
         if (level.isGameOver()) {
             running = false;
         }
 
-        // Render level
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         level.render(renderer, font);
         SDL_RenderPresent(renderer);
 
-        // Cap frame rate
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<float, std::milli> elapsed = end - start;
         if (elapsed.count() < FRAME_DELAY) {

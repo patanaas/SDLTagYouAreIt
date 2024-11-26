@@ -6,6 +6,7 @@
 
 class NPC {
 public:
+    NPC(); // Default constructor
     NPC(SDL_Renderer* renderer, int x, int y, int speed);
     ~NPC();
 
@@ -28,9 +29,11 @@ private:
     float posX, posY;
     float angle;
     int speed;
-    SDL_Texture* texture;
     bool tagged;
     bool removable;
+
+    // Add renderer as a member
+    SDL_Renderer* renderer;
 };
 
 #endif // NPC_H

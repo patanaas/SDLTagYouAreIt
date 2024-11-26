@@ -1,6 +1,11 @@
 #include "NPC.h"
 #include <iostream>
 
+NPC::NPC()
+    : renderer(nullptr), posX(0), posY(0), speed(0), angle(0), tagged(false), removable(false) {
+    rect = { 0, 0, 50, 50 }; // Initialize with default size
+}
+
 NPC::NPC(SDL_Renderer* renderer, int x, int y, int speed)
     : posX(x), posY(y), speed(speed), angle(0), tagged(false), removable(false) {
     rect = { x, y, 50, 50 }; // Initialize rect with integer positions
@@ -20,16 +25,11 @@ void NPC::update(float deltaTime, int playerX, int playerY) {
         // Move away from the player
         posX -= speed * deltaTime * (dx / distance);
         posY -= speed * deltaTime * (dy / distance);
-        
     }
     else if (distance > 160) {
         // Move toward the player
         posX += speed * deltaTime * (dx / distance);
         posY += speed * deltaTime * (dy / distance);
-        
-    }
-    else {
-        
     }
 
     // Update the integer rect position for rendering

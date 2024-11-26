@@ -7,6 +7,8 @@
 #include <SDL_ttf.h>
 #include "Player.h"
 #include "NPC.h"
+#include "ObjectPool.h"
+#include "StackAllocator.h"
 
 class Level {
 public:
@@ -22,13 +24,14 @@ public:
 
     bool isGameOver() const;
 
-    // Accessors
     Player* getPlayer() { return player; }
-    std::vector<NPC>& getNPCs() { return npcs; }
+    std::vector<NPC*>& getNPCs() { return activeNPCs; }
 
 private:
     Player* player;
-    std::vector<NPC> npcs;
+    std::vector<NPC*> activeNPCs; // Active NPCs in the game
+    ObjectPool<NPC> npcPool;      // Object pool for NPCs
+    StackAllocator stackAllocator; // Stack allocator for temporary memory
     SDL_Renderer* renderer;
 
     SDL_Texture* renderText(const std::string& message, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);
