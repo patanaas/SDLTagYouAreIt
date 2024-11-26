@@ -1,107 +1,15 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <iostream>
-#include <fstream>
-#include <vector>
-#include <cstdlib>
-#include <ctime>
 #include <chrono>
 #include <thread>
-#include <algorithm>
-#include <sstream>
-#include "Player.h"
-#include "NPC.h"
+#include "Level.h"
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
 const int FRAME_RATE = 80;
 const int FRAME_DELAY = 1000 / FRAME_RATE;
 const int NUM_NPCS = 10;
-
-// Function to render text to the screen
-SDL_Texture* renderText(const std::string& message, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer) {
-    SDL_Surface* surface = TTF_RenderText_Solid(font, message.c_str(), color);
-    if (!surface) {
-        std::cerr << "Failed to create text surface: " << TTF_GetError() << std::endl;
-        return nullptr;
-    }
-
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-
-    if (!texture) {
-        std::cerr << "Failed to create text texture: " << SDL_GetError() << std::endl;
-    }
-
-    return texture;
-}
-
-// Save the level to a binary file
-void saveLevel(const std::string& filename, const Player& player, const std::vector<NPC>& npcs) {
-    std::ofstream file(filename, std::ios::binary);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file for saving: " << filename << std::endl;
-        return;
-    }
-
-    // Save player position
-    int playerX = player.getX();
-    int playerY = player.getY();
-    file.write(reinterpret_cast<char*>(&playerX), sizeof(playerX));
-    file.write(reinterpret_cast<char*>(&playerY), sizeof(playerY));
-
-    // Save NPC count
-    int numNPCs = static_cast<int>(npcs.size());
-    file.write(reinterpret_cast<char*>(&numNPCs), sizeof(numNPCs));
-
-    // Save each NPC's data
-    for (const auto& npc : npcs) {
-        float posX = npc.getX();
-        float posY = npc.getY();
-        int speed = npc.getSpeed();
-        file.write(reinterpret_cast<char*>(&posX), sizeof(posX));
-        file.write(reinterpret_cast<char*>(&posY), sizeof(posY));
-        file.write(reinterpret_cast<char*>(&speed), sizeof(speed));
-    }
-
-    file.close();
-    std::cout << "Level saved to " << filename << std::endl;
-}
-
-// Load the level from a binary file
-void loadLevel(const std::string& filename, Player& player, std::vector<NPC>& npcs, SDL_Renderer* renderer) {
-    std::ifstream file(filename, std::ios::binary);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file for loading: " << filename << std::endl;
-        return;
-    }
-
-    // Load player position
-    int playerX, playerY;
-    file.read(reinterpret_cast<char*>(&playerX), sizeof(playerX));
-    file.read(reinterpret_cast<char*>(&playerY), sizeof(playerY));
-    player.setPosition(playerX, playerY);
-
-    // Load NPC count
-    int numNPCs;
-    file.read(reinterpret_cast<char*>(&numNPCs), sizeof(numNPCs));
-
-    // Clear existing NPCs
-    npcs.clear();
-
-    // Load each NPC's data
-    for (int i = 0; i < numNPCs; ++i) {
-        float posX, posY;
-        int speed;
-        file.read(reinterpret_cast<char*>(&posX), sizeof(posX));
-        file.read(reinterpret_cast<char*>(&posY), sizeof(posY));
-        file.read(reinterpret_cast<char*>(&speed), sizeof(speed));
-        npcs.emplace_back(renderer, static_cast<int>(posX), static_cast<int>(posY), speed);
-    }
-
-    file.close();
-    std::cout << "Level loaded from " << filename << std::endl;
-}
 
 int main(int argc, char* argv[]) {
     // Initialize SDL
@@ -147,21 +55,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Seed random number generator for NPC positions
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
+    // Initialize level
+    Level level(renderer);
+    level.init(NUM_NPCS);
 
-    // Initialize player
-    Player player(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100);
-
-    // Initialize NPCs
-    std::vector<NPC> npcs;
-    for (int i = 0; i < NUM_NPCS; ++i) {
-        int x = (SCREEN_WIDTH / 2) + (std::rand() % 300 - 150);
-        int y = (SCREEN_HEIGHT / 2) + (std::rand() % 300 - 150);
-        npcs.emplace_back(renderer, x, y, 60); // Speed is 60
-    }
-
-    // Main loop flag
     bool running = true;
     SDL_Event event;
 
@@ -174,85 +71,45 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_QUIT) {
                 running = false;
             }
-            player.handleEvent(event);
 
             if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                 case SDLK_i: // Increase NPC speed
-                    for (auto& npc : npcs) {
-                        npc.setSpeed(std::min(npc.getSpeed() + 10, 60)); // Max speed: 60
+                    for (auto& npc : level.getNPCs()) {
+                        npc.setSpeed(std::min(npc.getSpeed() + 10, 60));
                     }
                     break;
                 case SDLK_d: // Decrease NPC speed
-                    for (auto& npc : npcs) {
-                        npc.setSpeed(std::max(npc.getSpeed() - 10, 0)); // Min speed: 0
+                    for (auto& npc : level.getNPCs()) {
+                        npc.setSpeed(std::max(npc.getSpeed() - 10, 0));
                     }
                     break;
                 case SDLK_s: // Save level
-                    saveLevel("level.bin", player, npcs);
+                    level.save("level.bin");
                     break;
                 case SDLK_l: // Load level
-                    loadLevel("level.bin", player, npcs, renderer);
+                    level.load("level.bin");
+                    break;
+
+                case SDLK_ESCAPE: // Quit game
+                    running = false;
                     break;
                 }
             }
+
+            level.getPlayer()->handleEvent(event);
         }
 
-        // Update player
-        player.update(FRAME_DELAY / 1000.0f);
-
-        // Update NPCs
-        for (auto& npc : npcs) {
-            npc.update(FRAME_DELAY / 1000.0f, player.getX(), player.getY());
-            if (npc.checkTagged(player.getX(), player.getY())) {
-                npc.tag();
-            }
-        }
-
-        // Remove tagged NPCs
-        npcs.erase(std::remove_if(npcs.begin(), npcs.end(), [](const NPC& npc) {
-            return npc.isRemovable();
-            }), npcs.end());
-
-        // End game if all NPCs are tagged
-        if (npcs.empty()) {
+        // Update level
+        level.update(FRAME_DELAY / 1000.0f);
+        if (level.isGameOver()) {
             running = false;
         }
 
-        // Render objects
+        // Render level
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-
-        player.render(renderer);
-
-        for (const auto& npc : npcs) {
-            npc.render(renderer);
-        }
-
-        // Render Key Press Information
-        SDL_Color white = { 255, 255, 255, 255 };
-        std::string keyInfoText = "[I] Increase NPC Speed  [D] Decrease NPC Speed  [S] Save  [L] Load  [ESC] Quit";
-        SDL_Texture* keyInfoTexture = renderText(keyInfoText, font, white, renderer);
-        SDL_Rect keyInfoRect = { 10, 50, 1200, 30 };
-        SDL_RenderCopy(renderer, keyInfoTexture, nullptr, &keyInfoRect);
-        SDL_DestroyTexture(keyInfoTexture);
-
-        // Render Player Speed
-        std::stringstream playerSpeedStream;
-        playerSpeedStream << "Player Speed: " << 100;
-        SDL_Texture* playerSpeedTexture = renderText(playerSpeedStream.str(), font, white, renderer);
-        SDL_Rect playerSpeedRect = { 10, 90, 300, 30 };
-        SDL_RenderCopy(renderer, playerSpeedTexture, nullptr, &playerSpeedRect);
-        SDL_DestroyTexture(playerSpeedTexture);
-
-        // Render Enemy Count
-        std::stringstream enemyCountStream;
-        enemyCountStream << "Enemies Remaining: " << npcs.size();
-        SDL_Texture* enemyCountTexture = renderText(enemyCountStream.str(), font, white, renderer);
-        SDL_Rect enemyCountRect = { 10, 130, 300, 30 };
-        SDL_RenderCopy(renderer, enemyCountTexture, nullptr, &enemyCountRect);
-        SDL_DestroyTexture(enemyCountTexture);
-
+        level.render(renderer, font);
         SDL_RenderPresent(renderer);
 
         // Cap frame rate

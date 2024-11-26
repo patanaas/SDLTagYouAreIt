@@ -143,12 +143,14 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x64\SDL2_mixer.dll" "$(Targ
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NPC.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SDLTagYouAreIt.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Level.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
