@@ -1,40 +1,55 @@
 #include "NPC.h"
-#include <cmath>
+#include <iostream>
 
-NPC::NPC() : texture(nullptr), position(0, 0), isTagged(false), speed(60.0f) {}
-
-NPC::~NPC() {
-    delete texture;
+NPC::NPC(SDL_Renderer* renderer, int x, int y, int speed)
+    : posX(x), posY(y), speed(speed), angle(0), tagged(false), removable(false) {
+    rect = { x, y, 50, 50 }; // Initialize rect with integer positions
 }
 
-void NPC::Load(const std::string& filePath) {
-    texture = new Texture();
-    texture->Load(filePath);
-}
+NPC::~NPC() {}
 
-void NPC::Update(const Point& playerPosition, float deltaTime) {
-    if (isTagged) return;
+void NPC::update(float deltaTime, int playerX, int playerY) {
+    if (tagged) return; // Stop moving if tagged
 
-    float dx = playerPosition.X - position.X;
-    float dy = playerPosition.Y - position.Y;
-    float distance = sqrt(dx * dx + dy * dy);
+    // Calculate the distance to the player
+    int dx = playerX - static_cast<int>(posX);
+    int dy = playerY - static_cast<int>(posY);
+    float distance = std::sqrt(dx * dx + dy * dy);
 
-    if (distance > 0) {
-        position.X += (dx / distance) * speed * deltaTime;
-        position.Y += (dy / distance) * speed * deltaTime;
+    if (distance < 140) {
+        // Move away from the player
+        posX -= speed * deltaTime * (dx / distance);
+        posY -= speed * deltaTime * (dy / distance);
+        
     }
+    else if (distance > 160) {
+        // Move toward the player
+        posX += speed * deltaTime * (dx / distance);
+        posY += speed * deltaTime * (dy / distance);
+        
+    }
+    else {
+        
+    }
+
+    // Update the integer rect position for rendering
+    rect.x = static_cast<int>(posX);
+    rect.y = static_cast<int>(posY);
 }
 
-void NPC::Serialize(std::ostream& stream) {
-    stream.write(reinterpret_cast<char*>(&position), sizeof(position));
-    stream.write(reinterpret_cast<char*>(&isTagged), sizeof(isTagged));
+void NPC::render(SDL_Renderer* renderer) const {
+    SDL_SetRenderDrawColor(renderer, tagged ? 255 : 0, tagged ? 0 : 255, 0, 255);
+    SDL_RenderFillRect(renderer, &rect);
 }
 
-void NPC::Deserialize(std::istream& stream) {
-    stream.read(reinterpret_cast<char*>(&position), sizeof(position));
-    stream.read(reinterpret_cast<char*>(&isTagged), sizeof(isTagged));
+bool NPC::checkTagged(int playerX, int playerY) {
+    int dx = playerX - static_cast<int>(posX);
+    int dy = playerY - static_cast<int>(posY);
+    float distance = std::sqrt(dx * dx + dy * dy);
+    return distance < 30;
 }
 
-Rect NPC::GetRect() const {
-    return Rect(position.X, position.Y, texture->GetImageInfo()->width, texture->GetImageInfo()->height);
+void NPC::tag() {
+    tagged = true;
+    removable = true; // Mark for removal
 }

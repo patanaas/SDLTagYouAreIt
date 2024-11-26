@@ -1,26 +1,26 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "Texture.h"
-#include "BasicStructs.h"
+#include <SDL.h>
 
 class Player {
 public:
-    Player();
+    Player(SDL_Renderer* renderer, int x, int y, int speed);
     ~Player();
 
-    void Load(const std::string& filePath);
-    void Update(float deltaTime);
-    void Serialize(std::ostream& stream);
-    void Deserialize(std::istream& stream);
+    void handleEvent(const SDL_Event& event);
+    void update(float deltaTime);
+    void render(SDL_Renderer* renderer);
 
-    Texture* GetTexture() const { return texture; }
-    Rect GetRect() const;
-
-    Point position;
+    // Methods to get and set position
+    int getX() const { return rect.x; }
+    int getY() const { return rect.y; }
+    void setPosition(int x, int y) { rect.x = x; rect.y = y; }
 
 private:
-    Texture* texture;
+    SDL_Rect rect;
+    int speed;
+    int dx, dy;
 };
 
 #endif // PLAYER_H

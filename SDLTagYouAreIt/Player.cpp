@@ -1,32 +1,32 @@
 #include "Player.h"
-#include "Keyboard.h"
 
-Player::Player() : texture(nullptr), position(0, 0) {}
+Player::Player(SDL_Renderer* renderer, int x, int y, int speed) : rect{ x, y, 50, 50 }, speed(speed), dx(0), dy(0) {}
 
-Player::~Player() {
-    delete texture;
+Player::~Player() {}
+
+void Player::handleEvent(const SDL_Event& event) {
+    if (event.type == SDL_KEYDOWN) {
+        switch (event.key.keysym.sym) {
+        case SDLK_UP: dy = -1; break;
+        case SDLK_DOWN: dy = 1; break;
+        case SDLK_LEFT: dx = -1; break;
+        case SDLK_RIGHT: dx = 1; break;
+        }
+    }
+    if (event.type == SDL_KEYUP) {
+        switch (event.key.keysym.sym) {
+        case SDLK_UP: case SDLK_DOWN: dy = 0; break;
+        case SDLK_LEFT: case SDLK_RIGHT: dx = 0; break;
+        }
+    }
 }
 
-void Player::Load(const std::string& filePath) {
-    texture = new Texture();
-    texture->Load(filePath);
+void Player::update(float deltaTime) {
+    rect.x += dx * speed * deltaTime;
+    rect.y += dy * speed * deltaTime;
 }
 
-void Player::Update(float deltaTime) {
-    if (Keyboard::Instance().IsKeyDown(SDL_SCANCODE_W)) position.Y -= 100 * deltaTime;
-    if (Keyboard::Instance().IsKeyDown(SDL_SCANCODE_S)) position.Y += 100 * deltaTime;
-    if (Keyboard::Instance().IsKeyDown(SDL_SCANCODE_A)) position.X -= 100 * deltaTime;
-    if (Keyboard::Instance().IsKeyDown(SDL_SCANCODE_D)) position.X += 100 * deltaTime;
-}
-
-void Player::Serialize(std::ostream& stream) {
-    stream.write(reinterpret_cast<char*>(&position), sizeof(position));
-}
-
-void Player::Deserialize(std::istream& stream) {
-    stream.read(reinterpret_cast<char*>(&position), sizeof(position));
-}
-
-Rect Player::GetRect() const {
-    return Rect(position.X, position.Y, texture->GetImageInfo()->width, texture->GetImageInfo()->height);
+void Player::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    SDL_RenderFillRect(renderer, &rect);
 }

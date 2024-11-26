@@ -1,28 +1,36 @@
 #ifndef NPC_H
 #define NPC_H
 
-#include "Texture.h"
-#include "BasicStructs.h"
+#include <SDL.h>
+#include <cmath>
 
 class NPC {
 public:
-    NPC();
+    NPC(SDL_Renderer* renderer, int x, int y, int speed);
     ~NPC();
 
-    void Load(const std::string& filePath);
-    void Update(const Point& playerPosition, float deltaTime);
-    void Serialize(std::ostream& stream);
-    void Deserialize(std::istream& stream);
+    void update(float deltaTime, int playerX, int playerY);
+    void render(SDL_Renderer* renderer) const;
+    bool checkTagged(int playerX, int playerY);
+    void tag();
 
-    Texture* GetTexture() const { return texture; }
-    Rect GetRect() const;
+    bool isTagged() const { return tagged; }
+    bool isRemovable() const { return removable; }
 
-    Point position;
-    bool isTagged;
+    // Getters and setters for saving/loading
+    float getX() const { return posX; }
+    float getY() const { return posY; }
+    int getSpeed() const { return speed; }
+    void setSpeed(int newSpeed) { speed = newSpeed; }
 
 private:
-    Texture* texture;
-    float speed;
+    SDL_Rect rect;
+    float posX, posY;
+    float angle;
+    int speed;
+    SDL_Texture* texture;
+    bool tagged;
+    bool removable;
 };
 
 #endif // NPC_H
