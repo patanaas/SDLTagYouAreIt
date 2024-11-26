@@ -21,7 +21,7 @@ public:
 	vector<SDL_DisplayMode>& GetResolutions() { return m_resolution; }
 
 	// Methods
-	//void Initialize(int _xResolution, int _yResolution);
+	void Initialize(int _xResolution, int _yResolution);
 	Point GetWindowSize();
 	void SetViewport(Rect _viewport);
 	void RenderTexture(Texture* _texture, Rect _rect);
@@ -35,7 +35,7 @@ public:
 	void Shutdown();
 	void RenderTexture(Texture* _texture, Rect _srcRect, Rect _destRect);
 	void RenderTexture(SDL_Texture* _texture, Rect _srcRect, Rect _destRect, double _angle);
-	void Initialize();
+	//void Initialize();
 	void EnumerateDisplayModes();
 	void ChangeDisplayMode(SDL_DisplayMode* _mode);
 

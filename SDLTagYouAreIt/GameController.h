@@ -24,7 +24,7 @@ public:
 	// Methods
 	void RunGame();
 	// Week 9 Code for Input Core
-	void Initialize();
+	//void Initialize();
 	void ShutDown();
 	void HandleInput(SDL_Event _event);
 

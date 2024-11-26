@@ -206,19 +206,25 @@ void Renderer::RenderTexture(SDL_Texture* _texture, Rect _srcRect, Rect _destRec
         _angle, nullptr, SDL_FLIP_NONE)) >= 0), "Could not render texture");
 }
 
-void Renderer::Initialize()
+void Renderer::Initialize(int _xResolution, int _yResolution)
 {
-    M_ASSERT((SDL_Init(SDL_INIT_EVERYTHING) >= 0), "");
-    SDL_GetDisplayBounds(0, &m_srcRect);
-    int width = 1280;
-    int height = 720;
+    M_ASSERT((SDL_Init(SDL_INIT_EVERYTHING) >= 0), "ERROR");
     m_window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        width, height, SDL_WINDOW_SHOWN); // Use SDL_WINDOW_SHOWN for a regular window instead of fullscreen
-    /*m_window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        m_srcRect.w, m_srcRect.y, SDL_WINDOW_FULLSCREEN);*/
+        _xResolution, _yResolution, SDL_WINDOW_SHOWN);
     M_ASSERT(m_window != nullptr, "Failed to initialize SDL window.");
-    m_renderer = SDL_CreateRenderer(Renderer::Instance().GetWindow(), -1, 0);
+    m_renderer = SDL_CreateRenderer(Renderer::Instance().GetWindow(), -1, SDL_RENDERER_PRESENTVSYNC);
     M_ASSERT(m_renderer != nullptr, "Failed to initialize SDL renderer.");
+    //M_ASSERT((SDL_Init(SDL_INIT_EVERYTHING) >= 0), "");
+    //SDL_GetDisplayBounds(0, &m_srcRect);
+    //int width = 1280;
+    //int height = 720;
+    //m_window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    //    width, height, SDL_WINDOW_SHOWN); // Use SDL_WINDOW_SHOWN for a regular window instead of fullscreen
+    ///*m_window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    //    m_srcRect.w, m_srcRect.y, SDL_WINDOW_FULLSCREEN);*/
+    //M_ASSERT(m_window != nullptr, "Failed to initialize SDL window.");
+    //m_renderer = SDL_CreateRenderer(Renderer::Instance().GetWindow(), -1, 0);
+    //M_ASSERT(m_renderer != nullptr, "Failed to initialize SDL renderer.");
 }
 
 void Renderer::EnumerateDisplayModes()
