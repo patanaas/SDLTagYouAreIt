@@ -112,11 +112,19 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)External\SDL2-2.30.8\include;$(SolutionDir)External\SDL2_ttf-2.22.0\include;$(SolutionDir)External\SDL2_mixer-2.8.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)External\SDL2-2.30.8\lib\x64;$(SolutionDir)External\SDL2_ttf-2.22.0\lib\x64;$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>copy /Y "$(SolutionDir)External\SDL2-2.30.8\lib\x64\SDL2.dll" "$(TargetDir)"
+copy /Y "$(SolutionDir)External\SDL2_ttf-2.22.0\lib\x64\SDL2_ttf.dll" "$(TargetDir)"
+copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x64\SDL2_mixer.dll" "$(TargetDir)"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -142,6 +150,7 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="InputController.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Resource.cpp" />
@@ -164,6 +173,7 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x86\SDL2_mixer.dll" "$(Targ
     <ClInclude Include="GameController.h" />
     <ClInclude Include="InputController.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="ObjectPool1.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTarget.h" />

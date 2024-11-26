@@ -12,7 +12,7 @@ public:
 
 	// Methods
 	virtual void Serialize(std::ostream& _stream) = 0;
-	virtual void Deserializable(std::istream& _stream) = 0;
+	virtual void Deserialize(std::istream& _stream) = 0;
 }; 
 
 #endif // !SERIALIZABLE_H

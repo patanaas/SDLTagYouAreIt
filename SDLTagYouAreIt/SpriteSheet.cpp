@@ -1,18 +1,34 @@
 #include "SpriteSheet.h"
+#include "Renderer.h"
 
 ObjectPool1<SpriteSheet>* SpriteSheet::Pool;
 
-SpriteSheet::SpriteSheet()
-{
+SpriteSheet::SpriteSheet() : m_position(0, 0), m_scale(1.0f), m_rotation(0), m_tint(255, 255, 255, 255) {
     m_rows = 0;
     m_columns = 0;
     m_clipSizeX = 0;
     m_clipSizeY = 0;
 }
 
+
 SpriteSheet::~SpriteSheet()
 {
     m_animations.clear();
+}
+
+void SpriteSheet::Render() {
+    Rect srcRect = Update(EN_AN_IDLE, 0); // Default animation as a placeholder
+
+    Rect destRect(
+        m_position.X,
+        m_position.Y,
+        m_position.X + m_clipSizeX * m_scale,
+        m_position.Y + m_clipSizeY * m_scale
+    );
+
+    Renderer& renderer = Renderer::Instance();
+    renderer.SetDrawColor(m_tint);
+    renderer.RenderTexture(this, srcRect, destRect, m_rotation);
 }
 
 void SpriteSheet::SetSize(byte _rows, byte _columns, byte _clipSizeX, byte _clipSizeY)

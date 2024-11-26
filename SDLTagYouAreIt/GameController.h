@@ -2,52 +2,33 @@
 #define GAME_CONTROLLER_H
 
 #include "StandardIncludes.h"
-#include "AudioController.h"
+#include "Singleton.h"
 
-// Week 9 Code for Input Core
 class Renderer;
-class TTFont;
+class Level;
 class InputController;
-// Code for Week 10 Audio Core
-class AudioController;
-class SoundEffect;
-class Song;
-class WavDraw;
+class Keyboard;
 
-class GameController : public Singleton<GameController>
-{
+class GameController : public Singleton<GameController> {
 public:
-	// Constructors and Destructors
-	GameController();
-	virtual ~GameController();
+    // Constructors and Destructors
+    GameController();
+    virtual ~GameController();
 
-	// Methods
-	void RunGame();
-	// Week 9 Code for Input Core
-	void Initialize();
-	void ShutDown();
-	void HandleInput(SDL_Event _event);
+    // Methods
+    void RunGame();
+    void Initialize();
+    void ShutDown();
+    void HandleInput(SDL_Event _event);
+
+    void SetQuitFlag(bool quit) { m_quit = quit; }
 
 private:
-	// Members
-	SDL_Event m_sdlEvent;
+    // Members
+    SDL_Event m_sdlEvent;
+    bool m_quit;
 
-	// Week 9 Code for Input Core
-	Renderer* m_renderer;
-	TTFont* m_fArial20;
-	bool m_quit;
-	InputController* m_input;
-	//string m_text;
-	//string m_smPos;
-	//Point m_mPos;
-	//string m_ctInfo;
-	// Code for week 10 Audio Core
-	AudioController* m_audio;
-	SoundEffect* m_effects[MaxEffectChannels];
-	Song* m_song;
-	WavDraw* m_wavDraw;
-	float m_zoomY;
+    Level* m_level; // Add this member for managing the game level
 };
 
-#endif // !GAME_CONTROLLER_H
-
+#endif // GAME_CONTROLLER_H

@@ -30,6 +30,20 @@ public:
     SpriteSheet();
     virtual ~SpriteSheet();
 
+    void SetPosition(const Position& pos) { m_position = pos; }
+    Position GetPosition() const { return m_position; }
+
+    void SetRotation(float angle) { m_rotation = angle; }
+    float GetRotation() const { return m_rotation; }
+
+    void SetTint(const Color& color) { m_tint = color; }
+    Color GetTint() const { return m_tint; }
+
+    void SetScale(float scale) { m_scale = scale; }
+    float GetScale() const { return m_scale; }
+
+    void Render();
+
     // Methods
     void Serialize(std::ostream& _stream) override;
     void Deserialize(std::istream& _stream) override;
@@ -50,6 +64,10 @@ private:
     byte m_clipSizeX;
     byte m_clipSizeY;
     map<AnimationNames, SpriteAnim*> m_animations;
+    float m_scale;
+    float m_rotation;
+    Color m_tint;
+    Position m_position;
 };
 
 #endif // SPRITESHEET_H

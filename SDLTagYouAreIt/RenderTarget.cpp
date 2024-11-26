@@ -41,12 +41,16 @@ void RenderTarget::Stop()
 
 void RenderTarget::Render(float _deltaTime)
 {
-	//m_rotation += 10 * _deltaTime;
+	// Calculate scaling based on window size
 	Point ws = Renderer::Instance().GetWindowSize();
-	float perc = float(NATIVE_YRES - ws.Y) / NATIVE_YRES;	// e.g. 1080 - 600 = 480, therefore 480 = 0.4444444 of 1080
-	int xRes = ws.X + (NATIVE_XRES * perc);		// now add 0.444444 * NATIVE_XRES to the current resolution
-	// i.e. 0.444444 * 1920 = 853 + 800 = 1653
-	// same as ws.Y + (NATIVE_YRES * perc) = 600 * 0.4444444 = 480 + 600 = 1080
+	float perc = float(NATIVE_YRES - ws.Y) / NATIVE_YRES;
+	int xRes = ws.X + int(NATIVE_XRES * perc);
 	int yRes = NATIVE_YRES;
-	Renderer::Instance().RenderTexture(m_texture, Rect(0, 0, xRes, yRes), Rect(0, 0, ws.X, ws.Y), m_rotation);
+
+	// Create source and destination rectangles
+	Rect srcRect = Rect(0, 0, xRes, yRes);
+	Rect destRect = Rect(0, 0, ws.X, ws.Y);
+
+	// Use a function that works with SDL_Texture* (added a new function to Renderer if needed)
+	Renderer::Instance().RenderTexture(m_texture, srcRect, destRect, m_rotation);
 }
