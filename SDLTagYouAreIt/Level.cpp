@@ -5,7 +5,7 @@
 #include <algorithm>
 
 Level::Level(SDL_Renderer* renderer)
-    : renderer(renderer), player(nullptr), npcPool(100), stackAllocator(1024 * 1024) // Preallocate 100 NPCs, 1MB stack
+    : renderer(renderer), player(nullptr), npcPool(100), stackAllocator(1024 * 1024) 
 {}
 
 Level::~Level() {
@@ -13,12 +13,12 @@ Level::~Level() {
 }
 
 void Level::init(int numNPCs) {
-    // Initialize player
+    
     if (!player) {
         player = new Player(renderer, "../Assets/Textures/Warrior.tga");
     }
 
-    // Reset active NPCs and release all NPCs to the pool
+    
     activeNPCs.clear();
     npcPool.reset();
 
@@ -28,7 +28,9 @@ void Level::init(int numNPCs) {
         if (npc) {
             int x = (1920 / 2) + (std::rand() % 300 - 150);
             int y = (1080 / 2) + (std::rand() % 300 - 150);
-            *npc = NPC(renderer, x, y, 60); // Reinitialize the NPC
+            npc->~NPC(); 
+            new (npc) NPC(renderer, x, y, 60); 
+
             activeNPCs.push_back(npc);
         }
         else {
@@ -45,7 +47,7 @@ void Level::update(float deltaTime) {
     for (auto it = activeNPCs.begin(); it != activeNPCs.end();) {
         NPC* npc = *it;
 
-        // Temporary storage for computations using the stack allocator
+        
         float* distance = static_cast<float*>(stackAllocator.allocate(sizeof(float)));
         *distance = std::sqrt(std::pow(npc->getX() - player->getX(), 2) +
             std::pow(npc->getY() - player->getY(), 2));
@@ -53,7 +55,7 @@ void Level::update(float deltaTime) {
         npc->update(deltaTime, player->getX(), player->getY());
         if (npc->checkTagged(player->getX(), player->getY())) {
             npc->tag();
-            npcPool.release(npc); // Return NPC to pool
+            npcPool.release(npc);
             it = activeNPCs.erase(it);
         }
         else {
@@ -61,45 +63,62 @@ void Level::update(float deltaTime) {
         }
     }
 
-    // Clear stack allocator for next frame
+    
     stackAllocator.clear();
 }
 
 void Level::render(SDL_Renderer* renderer, TTF_Font* font) {
     NPC* npc = new NPC();
-    SDL_Color white = { 255, 255, 255, 255 };
+    SDL_Color white = { 0, 0, 0, 255 };
 
-    // Render player
+    
     if (player) {
         player->render(renderer);
     }
 
-    // Render NPCs
+    
     for (const auto& npc : activeNPCs) {
         npc->render(renderer);
     }
 
-    // Render additional information
+    
     std::string keyInfoText = "[I] Increase NPC Speed  [D] Decrease NPC Speed  [S] Save  [L] Load  [ESC] Quit";
     SDL_Texture* keyInfoTexture = renderText(keyInfoText, font, white, renderer);
     SDL_Rect keyInfoRect = { 10, 50, 1200, 30 };
     SDL_RenderCopy(renderer, keyInfoTexture, nullptr, &keyInfoRect);
     SDL_DestroyTexture(keyInfoTexture);
 
+    
     std::stringstream playerSpeedStream;
-    playerSpeedStream << "Player Speed: " << 100; // Hardcoded as 100
+    playerSpeedStream << "Player Speed: " << 100; 
     SDL_Texture* playerSpeedTexture = renderText(playerSpeedStream.str(), font, white, renderer);
     SDL_Rect playerSpeedRect = { 10, 90, 300, 30 };
     SDL_RenderCopy(renderer, playerSpeedTexture, nullptr, &playerSpeedRect);
     SDL_DestroyTexture(playerSpeedTexture);
 
+    
+    int totalSpeed = 0;
+    for (const auto& npc : activeNPCs) {
+        totalSpeed += npc->getSpeed();
+    }
+    int averageSpeed = activeNPCs.empty() ? 0 : totalSpeed / activeNPCs.size();
+
+    std::stringstream npcSpeedStream;
+    npcSpeedStream << "NPC Average Speed: " << averageSpeed;
+    SDL_Texture* npcSpeedTexture = renderText(npcSpeedStream.str(), font, white, renderer);
+    SDL_Rect npcSpeedRect = { 10, 130, 300, 30 };
+    SDL_RenderCopy(renderer, npcSpeedTexture, nullptr, &npcSpeedRect);
+    SDL_DestroyTexture(npcSpeedTexture);
+
+    
     std::stringstream enemyCountStream;
     enemyCountStream << "Enemies Remaining: " << activeNPCs.size();
     SDL_Texture* enemyCountTexture = renderText(enemyCountStream.str(), font, white, renderer);
-    SDL_Rect enemyCountRect = { 10, 130, 300, 30 };
+    SDL_Rect enemyCountRect = { 10, 170, 300, 30 };
     SDL_RenderCopy(renderer, enemyCountTexture, nullptr, &enemyCountRect);
     SDL_DestroyTexture(enemyCountTexture);
 }
+
 
 bool Level::isGameOver() const {
     return activeNPCs.empty();
@@ -129,17 +148,24 @@ void Level::save(const std::string& filename) {
         return;
     }
 
-    // Save player position
-    int playerX = player->getX();
-    int playerY = player->getY();
-    file.write(reinterpret_cast<char*>(&playerX), sizeof(playerX));
-    file.write(reinterpret_cast<char*>(&playerY), sizeof(playerY));
+    
+    if (player) {
+        int playerX = player->getX();
+        int playerY = player->getY();
+        file.write(reinterpret_cast<char*>(&playerX), sizeof(playerX));
+        file.write(reinterpret_cast<char*>(&playerY), sizeof(playerY));
+    }
+    else {
+        int invalidPos = -1;
+        file.write(reinterpret_cast<char*>(&invalidPos), sizeof(invalidPos));
+        file.write(reinterpret_cast<char*>(&invalidPos), sizeof(invalidPos));
+    }
 
-    // Save NPC count
+   
     int numNPCs = static_cast<int>(activeNPCs.size());
     file.write(reinterpret_cast<char*>(&numNPCs), sizeof(numNPCs));
 
-    // Save each NPC's data
+    
     for (const auto& npc : activeNPCs) {
         float posX = npc->getX();
         float posY = npc->getY();
@@ -156,6 +182,7 @@ void Level::save(const std::string& filename) {
     std::cout << "Level saved to " << filename << std::endl;
 }
 
+
 void Level::load(const std::string& filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -163,43 +190,66 @@ void Level::load(const std::string& filename) {
         return;
     }
 
-    // Load player position
+    
     int playerX, playerY;
     file.read(reinterpret_cast<char*>(&playerX), sizeof(playerX));
     file.read(reinterpret_cast<char*>(&playerY), sizeof(playerY));
+    if (playerX == -1 || playerY == -1) {
+        std::cerr << "Invalid player position in save file." << std::endl;
+        file.close();
+        return;
+    }
+
+    if (!player) {
+        player = new Player(renderer, "../Assets/Textures/Warrior.tga");
+    }
     player->setPosition(playerX, playerY);
 
-    // Load NPC count
+    
     int numNPCs;
     file.read(reinterpret_cast<char*>(&numNPCs), sizeof(numNPCs));
+    if (numNPCs < 0 || numNPCs > 100) { // Sanity check
+        std::cerr << "Invalid NPC count in save file: " << numNPCs << std::endl;
+        file.close();
+        return;
+    }
 
-    // Clear active NPCs and reset the pool
+    
     activeNPCs.clear();
     npcPool.reset();
 
-    // Load each NPC's data
+    
     for (int i = 0; i < numNPCs; ++i) {
         NPC* npc = npcPool.acquire();
-        if (npc) {
-            float posX, posY;
-            int speed;
-            bool tagged;
-
-            file.read(reinterpret_cast<char*>(&posX), sizeof(posX));
-            file.read(reinterpret_cast<char*>(&posY), sizeof(posY));
-            file.read(reinterpret_cast<char*>(&speed), sizeof(speed));
-            file.read(reinterpret_cast<char*>(&tagged), sizeof(tagged));
-
-            // Reinitialize the NPC
-            *npc = NPC(renderer, static_cast<int>(posX), static_cast<int>(posY), speed);
-            if (tagged) {
-                npc->tag();
-            }
-
-            activeNPCs.push_back(npc);
+        if (!npc) {
+            std::cerr << "Failed to acquire NPC from pool. Pool exhausted." << std::endl;
+            break;
         }
+
+        float posX, posY;
+        int speed;
+        bool tagged;
+
+        file.read(reinterpret_cast<char*>(&posX), sizeof(posX));
+        file.read(reinterpret_cast<char*>(&posY), sizeof(posY));
+        file.read(reinterpret_cast<char*>(&speed), sizeof(speed));
+        file.read(reinterpret_cast<char*>(&tagged), sizeof(tagged));
+
+        if (file.fail()) {
+            std::cerr << "Error reading NPC data from file." << std::endl;
+            break;
+        }
+
+        
+        new (npc) NPC(renderer, static_cast<int>(posX), static_cast<int>(posY), speed);
+        if (tagged) {
+            npc->tag();
+        }
+
+        activeNPCs.push_back(npc);
     }
 
     file.close();
     std::cout << "Level loaded from " << filename << std::endl;
 }
+

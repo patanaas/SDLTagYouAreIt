@@ -41,7 +41,6 @@ SDL_Texture* TGAReader::loadTGA(const std::string& filename, SDL_Renderer* rende
     file.seekg(header.idLength, std::ios::cur);
     file.read(reinterpret_cast<char*>(imageData.data()), imageSize);
 
-    // Flip the image vertically if needed
     if (!(header.imageDescriptor & 0x20)) {
         for (size_t y = 0; y < header.height / 2; ++y) {
             for (size_t x = 0; x < header.width * 4; ++x) {

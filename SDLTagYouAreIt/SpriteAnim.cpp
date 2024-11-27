@@ -6,43 +6,40 @@ SpriteAnim::SpriteAnim(SpriteSheet* spriteSheet, float frameTime)
     currentFrame(0), elapsedTime(0.0f), frameTime(frameTime) {}
 
 void SpriteAnim::update(float deltaTime) {
-    // Accumulate elapsed time
+    
     elapsedTime += deltaTime;
 
-    // Advance frame only if enough time has passed
+    
     if (elapsedTime >= frameTime) {
-        elapsedTime -= frameTime; // Subtract frameTime instead of resetting to 0
+        elapsedTime -= frameTime; 
         currentFrame++;
 
-        // Loop back to the start frame if we exceed the end frame
+        
         if (currentFrame > endFrame) {
             currentFrame = startFrame;
         }
     }
 
-    // Debugging log for frame updates
-    std::cout << "currentFrame: " << currentFrame << ", elapsedTime: " << elapsedTime << std::endl;
+    
 }
 
 
 
 
 void SpriteAnim::render(SDL_Renderer* renderer, int x, int y, float scale, float angle, SDL_Color tint) const {
-    SDL_Rect srcRect = spriteSheet->getFrame(currentFrame); // Extract current frame
+    SDL_Rect srcRect = spriteSheet->getFrame(currentFrame); 
     SDL_Rect dstRect = {
-        x - static_cast<int>(srcRect.w * scale) / 2, // Center horizontally
-        y - static_cast<int>(srcRect.h * scale) / 2, // Center vertically
-        static_cast<int>(srcRect.w * scale),        // Scale width
-        static_cast<int>(srcRect.h * scale)         // Scale height
+        x - static_cast<int>(srcRect.w * scale) / 2, 
+        y - static_cast<int>(srcRect.h * scale) / 2, 
+        static_cast<int>(srcRect.w * scale),        
+        static_cast<int>(srcRect.h * scale)         
     };
 
-    // Ensure consistent color mod and alpha
+    
     SDL_SetTextureColorMod(spriteSheet->getTexture(), tint.r, tint.g, tint.b);
-    SDL_SetTextureAlphaMod(spriteSheet->getTexture(), 255); // Full opacity
+    SDL_SetTextureAlphaMod(spriteSheet->getTexture(), 255); 
 
     SDL_RenderCopyEx(renderer, spriteSheet->getTexture(), &srcRect, &dstRect, angle, nullptr, SDL_FLIP_NONE);
-    std::cout << "currentFrame: " << currentFrame
-        << ", elapsedTime: " << elapsedTime << std::endl;
 
 }
 

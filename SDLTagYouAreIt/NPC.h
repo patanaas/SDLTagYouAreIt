@@ -4,6 +4,14 @@
 #include <SDL.h>
 #include <cmath>
 #include <SDL_mixer.h>
+#include "SpriteSheet.h"
+#include "SpriteAnim.h"
+
+enum class NPCState {
+    Idle,
+    Running,
+    Tagged
+};
 
 class NPC {
 public:
@@ -26,7 +34,7 @@ public:
     float getY() const { return posY; }
     int getSpeed() const { return speed; }
     void setSpeed(int newSpeed) { speed = newSpeed; }
-
+    NPCState getState() const { return state; }
 private:
     SDL_Rect rect;
     float posX, posY;
@@ -36,9 +44,14 @@ private:
     bool removable;
     static Mix_Chunk* tagSound;
     
+    NPCState state;
+    float taggedTime;  // Time elapsed since tagged
+    float taggedRemovalDelay;  // Delay before removal
 
     // Add renderer as a member
     SDL_Renderer* renderer;
+    SpriteSheet* spriteSheet;
+    SpriteAnim* anim;
 };
 
 #endif // NPC_H

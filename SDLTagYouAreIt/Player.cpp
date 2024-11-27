@@ -7,7 +7,7 @@ const int FRAME_HEIGHT = 45;
 const float PLAYER_SCALE = 1.25f;
 const float FRAME_TIME = 0.15f;
 
-// Define animation ranges
+
 const int IDLE_START = 0;
 const int IDLE_END = 10;
 const int RUN_START = 15;
@@ -26,7 +26,7 @@ Player::Player(SDL_Renderer* renderer, const std::string& spritePath)
     spriteSheet = new SpriteSheet(warriorTexture, FRAME_WIDTH, FRAME_HEIGHT);
     anim = new SpriteAnim(spriteSheet, FRAME_TIME);
 
-    anim->setAnimationRange(IDLE_START, IDLE_END); // Default to idle animation
+    anim->setAnimationRange(IDLE_START, IDLE_END); 
 }
 
 
@@ -53,27 +53,21 @@ void Player::handleEvent(const SDL_Event& event) {
 }
 
 void Player::update(float deltaTime) {
-    // Track whether the player is idle or moving
     bool isIdle = (dx == 0 && dy == 0);
 
     if (isIdle) {
-        // Switch to idle animation only if it's not already active
         if (anim->getStartFrame() != IDLE_START || anim->getEndFrame() != IDLE_END) {
             anim->setAnimationRange(IDLE_START, IDLE_END);
-            anim->reset(); // Reset to start frame of idle animation
-            std::cout << "Switching to Idle Animation: " << IDLE_START << "-" << IDLE_END << std::endl;
+            anim->reset(); 
         }
     }
     else {
-        // Switch to run animation only if it's not already active
+
         if (anim->getStartFrame() != RUN_START || anim->getEndFrame() != RUN_END) {
             anim->setAnimationRange(RUN_START, RUN_END);
-            anim->reset(); // Reset to start frame of run animation
-            std::cout << "Switching to Run Animation: " << RUN_START << "-" << RUN_END << std::endl;
+            anim->reset(); 
         }
     }
-
-    // Update the animation and player's position
     anim->update(deltaTime);
 
     rect.x += static_cast<int>(dx * speed * deltaTime);
@@ -84,8 +78,8 @@ void Player::update(float deltaTime) {
 
 
 void Player::render(SDL_Renderer* renderer) {
-    float angle = (dx > 0) ? 0 : (dx < 0) ? 180 : 0; // Face left/right
-    SDL_Color blueTint = { 0, 0, 255, 255 }; // Blue tint
+    float angle = (dx > 0) ? 0 : (dx < 0) ? 180 : 0; 
+    SDL_Color blueTint = { 0, 0, 255, 255 };
 
     anim->render(renderer, rect.x, rect.y, PLAYER_SCALE, angle, blueTint);
 }
