@@ -3,6 +3,14 @@
 
 #include <SDL.h>
 #include <cmath>
+#include "SpriteSheet.h"
+#include "SpriteAnim.h"
+
+enum class NPCState {
+    Idle,
+    Running,
+    Tagged
+};
 
 class NPC {
 public:
@@ -23,7 +31,7 @@ public:
     float getY() const { return posY; }
     int getSpeed() const { return speed; }
     void setSpeed(int newSpeed) { speed = newSpeed; }
-
+    NPCState getState() const { return state; }
 private:
     SDL_Rect rect;
     float posX, posY;
@@ -31,9 +39,12 @@ private:
     int speed;
     bool tagged;
     bool removable;
+    NPCState state;
 
     // Add renderer as a member
     SDL_Renderer* renderer;
+    SpriteSheet* spriteSheet;
+    SpriteAnim* anim;
 };
 
 #endif // NPC_H

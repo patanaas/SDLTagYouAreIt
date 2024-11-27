@@ -28,7 +28,9 @@ void Level::init(int numNPCs) {
         if (npc) {
             int x = (1920 / 2) + (std::rand() % 300 - 150);
             int y = (1080 / 2) + (std::rand() % 300 - 150);
-            *npc = NPC(renderer, x, y, 60); // Reinitialize the NPC
+            npc->~NPC(); // Explicitly call the destructor for the existing object
+            new (npc) NPC(renderer, x, y, 60); // Use placement new to construct the object properly
+
             activeNPCs.push_back(npc);
         }
         else {
@@ -85,6 +87,7 @@ void Level::render(SDL_Renderer* renderer, TTF_Font* font) {
     SDL_RenderCopy(renderer, keyInfoTexture, nullptr, &keyInfoRect);
     SDL_DestroyTexture(keyInfoTexture);
 
+    // Render player speed
     std::stringstream playerSpeedStream;
     playerSpeedStream << "Player Speed: " << 100; // Hardcoded as 100
     SDL_Texture* playerSpeedTexture = renderText(playerSpeedStream.str(), font, white, renderer);
@@ -92,13 +95,29 @@ void Level::render(SDL_Renderer* renderer, TTF_Font* font) {
     SDL_RenderCopy(renderer, playerSpeedTexture, nullptr, &playerSpeedRect);
     SDL_DestroyTexture(playerSpeedTexture);
 
+    // Calculate and render average NPC speed
+    int totalSpeed = 0;
+    for (const auto& npc : activeNPCs) {
+        totalSpeed += npc->getSpeed();
+    }
+    int averageSpeed = activeNPCs.empty() ? 0 : totalSpeed / activeNPCs.size();
+
+    std::stringstream npcSpeedStream;
+    npcSpeedStream << "NPC Average Speed: " << averageSpeed;
+    SDL_Texture* npcSpeedTexture = renderText(npcSpeedStream.str(), font, white, renderer);
+    SDL_Rect npcSpeedRect = { 10, 130, 300, 30 };
+    SDL_RenderCopy(renderer, npcSpeedTexture, nullptr, &npcSpeedRect);
+    SDL_DestroyTexture(npcSpeedTexture);
+
+    // Render enemies remaining
     std::stringstream enemyCountStream;
     enemyCountStream << "Enemies Remaining: " << activeNPCs.size();
     SDL_Texture* enemyCountTexture = renderText(enemyCountStream.str(), font, white, renderer);
-    SDL_Rect enemyCountRect = { 10, 130, 300, 30 };
+    SDL_Rect enemyCountRect = { 10, 170, 300, 30 };
     SDL_RenderCopy(renderer, enemyCountTexture, nullptr, &enemyCountRect);
     SDL_DestroyTexture(enemyCountTexture);
 }
+
 
 bool Level::isGameOver() const {
     return activeNPCs.empty();
