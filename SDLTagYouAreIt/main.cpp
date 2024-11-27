@@ -6,6 +6,7 @@
 #include <algorithm> // For std::min and std::max
 #include "Level.h"
 #include <SDL_mixer.h>
+#include "NPC.h"
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
@@ -22,9 +23,17 @@ int main(int argc, char* argv[]) {
 
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
         std::cerr << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        SDL_Quit();
         return 1;
     }
     Mix_AllocateChannels(16);  // Allocating 16 channels for simultaneous sound effects
+    // Initialize NPC sound
+    if (!NPC::initializeSound()) {
+        std::cerr << "Failed to initialize NPC sound effects!" << std::endl;
+        Mix_CloseAudio();
+        SDL_Quit();
+        return 1;
+    }
 
     // Initialize SDL_ttf
     if (TTF_Init() == -1) {
@@ -150,6 +159,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Cleanup
+    NPC::cleanupSound();
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

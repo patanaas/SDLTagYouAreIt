@@ -13,7 +13,7 @@
 class Level {
 public:
     Level(SDL_Renderer* renderer);
-    ~Level();
+    virtual ~Level();
 
     void init(int numNPCs);
     void update(float deltaTime);
@@ -33,6 +33,7 @@ private:
     ObjectPool<NPC> npcPool;      // Object pool for NPCs
     StackAllocator stackAllocator; // Stack allocator for temporary memory
     SDL_Renderer* renderer;
+    Mix_Chunk* tagSound;
 
     SDL_Texture* renderText(const std::string& message, TTF_Font* font, SDL_Color color, SDL_Renderer* renderer);
 };

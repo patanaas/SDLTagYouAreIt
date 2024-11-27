@@ -9,13 +9,14 @@ class NPC {
 public:
     NPC(); // Default constructor
     NPC(SDL_Renderer* renderer, int x, int y, int speed);
-    ~NPC();
+    virtual ~NPC();
 
     void update(float deltaTime, int playerX, int playerY);
     void render(SDL_Renderer* renderer) const;
     bool checkTagged(int playerX, int playerY);
     void tag();
-    void initializeSound();
+    static bool initializeSound();
+    static void cleanupSound();
 
     bool isTagged() const { return tagged; }
     bool isRemovable() const { return removable; }
@@ -33,7 +34,7 @@ private:
     int speed;
     bool tagged;
     bool removable;
-    Mix_Chunk* tagSound;
+    static Mix_Chunk* tagSound;
     
 
     // Add renderer as a member

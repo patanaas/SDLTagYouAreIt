@@ -8,7 +8,7 @@
 class Player {
 public:
     Player(SDL_Renderer* renderer, const std::string& spritePath);
-    ~Player();
+    virtual ~Player();
 
     void handleEvent(const SDL_Event& event);
     void update(float deltaTime);

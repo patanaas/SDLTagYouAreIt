@@ -3,15 +3,23 @@
 #include <SDL_mixer.h>
 
 // Static member to load sound only once
-//Mix_Chunk* NPC::tagSound = nullptr;
+Mix_Chunk* NPC::tagSound = nullptr;
 
-// Load sound once, not in constructor
-void NPC::initializeSound() {
+bool NPC::initializeSound() {
     if (!tagSound) {
         tagSound = Mix_LoadWAV("../Assets/Audio/Effects/Whoosh.wav");
         if (!tagSound) {
             std::cerr << "Failed to load tag sound effect! SDL_mixer Error: " << Mix_GetError() << std::endl;
+            return false;
         }
+    }
+    return true;
+}
+
+void NPC::cleanupSound() {
+    if (tagSound) {
+        Mix_FreeChunk(tagSound);
+        tagSound = nullptr;
     }
 }
 
@@ -23,18 +31,10 @@ NPC::NPC()
 NPC::NPC(SDL_Renderer* renderer, int x, int y, int speed)
     : posX(x), posY(y), speed(speed), angle(0), tagged(false), removable(false) {
     rect = { x, y, 50, 50 }; // Initialize rect with integer positions
-    tagSound = Mix_LoadWAV("../Assets/Audio/Effects/Whoosh.wav");
-    if (!tagSound) {
-        std::cerr << "Failed to load tag sound effect! SDL_mixer Error: " << Mix_GetError() << std::endl;
-    }
 }
 
 NPC::~NPC() 
 {
-    if (tagSound) {
-        Mix_FreeChunk(tagSound);
-        tagSound = nullptr;
-    }
 }
 
 void NPC::update(float deltaTime, int playerX, int playerY) {
@@ -87,10 +87,20 @@ bool NPC::checkTagged(int playerX, int playerY) {
 //}
 
 void NPC::tag() {
-    if (!tagged) { // Play the sound only the first time it's tagged
-        Mix_PlayChannel(-1, tagSound, 0);
+    //if (!tagged) { // Play the sound only the first time it's tagged
+    //    Mix_PlayChannel(-1, tagSound, 0);
+    //    tagged = true;
+    //}
+    ////tagged = true;
+    //removable = true; // Mark for removal
+    if (!tagged) {
+        if (tagSound) {
+            int channel = Mix_PlayChannel(-1, tagSound, 0);
+            if (channel == -1) {
+                std::cerr << "Unable to play sound effect: " << Mix_GetError() << std::endl;
+            }
+        }
         tagged = true;
+        removable = true;
     }
-    //tagged = true;
-    removable = true; // Mark for removal
 }
