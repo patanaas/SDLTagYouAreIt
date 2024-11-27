@@ -19,5 +19,5 @@ SDL_Rect SpriteSheet::getFrame(int index) const {
     if (index >= 0 && index < static_cast<int>(frames.size())) {
         return frames[index];
     }
-    return { 0, 0, 0, 0 }; // Return an empty rect if the index is invalid
+    return { 0, 0, 0, 0 }; 
 }

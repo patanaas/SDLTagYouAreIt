@@ -40,6 +40,8 @@ private:
     bool tagged;
     bool removable;
     NPCState state;
+    float taggedTime;  // Time elapsed since tagged
+    float taggedRemovalDelay;  // Delay before removal
 
     // Add renderer as a member
     SDL_Renderer* renderer;
