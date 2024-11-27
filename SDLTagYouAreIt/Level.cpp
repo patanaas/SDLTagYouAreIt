@@ -15,7 +15,7 @@ Level::~Level() {
 void Level::init(int numNPCs) {
     // Initialize player
     if (!player) {
-        player = new Player(renderer, 1920 / 2, 1080 / 2, 100);
+        player = new Player(renderer, "../Assets/Textures/Warrior.tga");
     }
 
     // Reset active NPCs and release all NPCs to the pool
@@ -156,7 +156,6 @@ void Level::save(const std::string& filename) {
     std::cout << "Level saved to " << filename << std::endl;
 }
 
-
 void Level::load(const std::string& filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -204,4 +203,3 @@ void Level::load(const std::string& filename) {
     file.close();
     std::cout << "Level loaded from " << filename << std::endl;
 }
-

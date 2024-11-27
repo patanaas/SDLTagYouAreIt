@@ -1,15 +1,46 @@
 #include "Player.h"
+#include "TGAReader.h"
+#include <iostream>
 
-Player::Player(SDL_Renderer* renderer, int x, int y, int speed) : rect{ x, y, 50, 50 }, speed(speed), dx(0), dy(0) {}
+const int FRAME_WIDTH = 30;
+const int FRAME_HEIGHT = 45;
+const float PLAYER_SCALE = 1.25f;
+const float FRAME_TIME = 0.15f;
 
-Player::~Player() {}
+// Define animation ranges
+const int IDLE_START = 0;
+const int IDLE_END = 10;
+const int RUN_START = 15;
+const int RUN_END = 29;
+
+Player::Player(SDL_Renderer* renderer, const std::string& spritePath)
+    : speed(100), dx(0), dy(0), spriteSheet(nullptr), anim(nullptr) {
+    rect = { 1920 / 2, 1080 / 2, static_cast<int>(FRAME_WIDTH * PLAYER_SCALE), static_cast<int>(FRAME_HEIGHT * PLAYER_SCALE) };
+
+    SDL_Texture* warriorTexture = TGAReader::loadTGA(spritePath, renderer);
+    if (!warriorTexture) {
+        std::cerr << "Failed to load Warrior.tga" << std::endl;
+        return;
+    }
+
+    spriteSheet = new SpriteSheet(warriorTexture, FRAME_WIDTH, FRAME_HEIGHT);
+    anim = new SpriteAnim(spriteSheet, FRAME_TIME);
+
+    anim->setAnimationRange(IDLE_START, IDLE_END); // Default to idle animation
+}
+
+
+Player::~Player() {
+    delete anim;
+    delete spriteSheet;
+}
 
 void Player::handleEvent(const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN) {
         switch (event.key.keysym.sym) {
-        case SDLK_UP: dy = -1; break;
-        case SDLK_DOWN: dy = 1; break;
-        case SDLK_LEFT: dx = -1; break;
+        case SDLK_UP:    dy = -1; break;
+        case SDLK_DOWN:  dy = 1; break;
+        case SDLK_LEFT:  dx = -1; break;
         case SDLK_RIGHT: dx = 1; break;
         }
     }
@@ -22,11 +53,39 @@ void Player::handleEvent(const SDL_Event& event) {
 }
 
 void Player::update(float deltaTime) {
-    rect.x += dx * speed * deltaTime;
-    rect.y += dy * speed * deltaTime;
+    // Track whether the player is idle or moving
+    bool isIdle = (dx == 0 && dy == 0);
+
+    if (isIdle) {
+        // Switch to idle animation only if it's not already active
+        if (anim->getStartFrame() != IDLE_START || anim->getEndFrame() != IDLE_END) {
+            anim->setAnimationRange(IDLE_START, IDLE_END);
+            anim->reset(); // Reset to start frame of idle animation
+            std::cout << "Switching to Idle Animation: " << IDLE_START << "-" << IDLE_END << std::endl;
+        }
+    }
+    else {
+        // Switch to run animation only if it's not already active
+        if (anim->getStartFrame() != RUN_START || anim->getEndFrame() != RUN_END) {
+            anim->setAnimationRange(RUN_START, RUN_END);
+            anim->reset(); // Reset to start frame of run animation
+            std::cout << "Switching to Run Animation: " << RUN_START << "-" << RUN_END << std::endl;
+        }
+    }
+
+    // Update the animation and player's position
+    anim->update(deltaTime);
+
+    rect.x += static_cast<int>(dx * speed * deltaTime);
+    rect.y += static_cast<int>(dy * speed * deltaTime);
 }
 
+
+
+
 void Player::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    float angle = (dx > 0) ? 0 : (dx < 0) ? 180 : 0; // Face left/right
+    SDL_Color blueTint = { 0, 0, 255, 255 }; // Blue tint
+
+    anim->render(renderer, rect.x, rect.y, PLAYER_SCALE, angle, blueTint);
 }
