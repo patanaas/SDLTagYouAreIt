@@ -5,6 +5,7 @@
 #include <thread>
 #include <algorithm> // For std::min and std::max
 #include "Level.h"
+#include <SDL_mixer.h>
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
@@ -18,6 +19,12 @@ int main(int argc, char* argv[]) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
         return 1;
     }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        std::cerr << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        return 1;
+    }
+    Mix_AllocateChannels(16);  // Allocating 16 channels for simultaneous sound effects
 
     // Initialize SDL_ttf
     if (TTF_Init() == -1) {
@@ -123,6 +130,8 @@ int main(int argc, char* argv[]) {
     SDL_DestroyWindow(window);
     TTF_Quit();
     SDL_Quit();
+    Mix_CloseAudio();
+    //Mix_FreeChunk(tagSound);
 
     return 0;
 }

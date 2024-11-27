@@ -155,6 +155,7 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x64\SDL2_mixer.dll" "$(Targ
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="StackAllocator.h" />
+    <ClInclude Include="StandardIncludes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

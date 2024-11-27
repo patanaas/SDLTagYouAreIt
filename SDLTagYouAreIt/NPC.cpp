@@ -1,5 +1,19 @@
 #include "NPC.h"
 #include <iostream>
+#include <SDL_mixer.h>
+
+// Static member to load sound only once
+//Mix_Chunk* NPC::tagSound = nullptr;
+
+// Load sound once, not in constructor
+void NPC::initializeSound() {
+    if (!tagSound) {
+        tagSound = Mix_LoadWAV("../Assets/Audio/Effects/Whoosh.wav");
+        if (!tagSound) {
+            std::cerr << "Failed to load tag sound effect! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        }
+    }
+}
 
 NPC::NPC()
     : renderer(nullptr), posX(0), posY(0), speed(0), angle(0), tagged(false), removable(false) {
@@ -9,9 +23,19 @@ NPC::NPC()
 NPC::NPC(SDL_Renderer* renderer, int x, int y, int speed)
     : posX(x), posY(y), speed(speed), angle(0), tagged(false), removable(false) {
     rect = { x, y, 50, 50 }; // Initialize rect with integer positions
+    tagSound = Mix_LoadWAV("../Assets/Audio/Effects/Whoosh.wav");
+    if (!tagSound) {
+        std::cerr << "Failed to load tag sound effect! SDL_mixer Error: " << Mix_GetError() << std::endl;
+    }
 }
 
-NPC::~NPC() {}
+NPC::~NPC() 
+{
+    if (tagSound) {
+        Mix_FreeChunk(tagSound);
+        tagSound = nullptr;
+    }
+}
 
 void NPC::update(float deltaTime, int playerX, int playerY) {
     if (tagged) return; // Stop moving if tagged
@@ -49,7 +73,24 @@ bool NPC::checkTagged(int playerX, int playerY) {
     return distance < 30;
 }
 
+//void NPC::tag() {
+//    if (!tagged) {
+//        //if (tagSound) {
+//            // Use a dynamic channel selection
+//            int channel = Mix_PlayChannel(-1, tagSound, 0);
+//            if (channel == -1) {
+//                std::cerr << "Unable to play sound effect: " << Mix_GetError() << std::endl;
+//            }
+//        //}
+//        tagged = true;
+//    }
+//}
+
 void NPC::tag() {
-    tagged = true;
+    if (!tagged) { // Play the sound only the first time it's tagged
+        Mix_PlayChannel(-1, tagSound, 0);
+        tagged = true;
+    }
+    //tagged = true;
     removable = true; // Mark for removal
 }

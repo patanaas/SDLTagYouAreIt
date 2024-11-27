@@ -66,6 +66,7 @@ void Level::update(float deltaTime) {
 }
 
 void Level::render(SDL_Renderer* renderer, TTF_Font* font) {
+    NPC* npc = new NPC();
     SDL_Color white = { 255, 255, 255, 255 };
 
     // Render player

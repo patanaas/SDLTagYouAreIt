@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include <cmath>
+#include <SDL_mixer.h>
 
 class NPC {
 public:
@@ -14,6 +15,7 @@ public:
     void render(SDL_Renderer* renderer) const;
     bool checkTagged(int playerX, int playerY);
     void tag();
+    void initializeSound();
 
     bool isTagged() const { return tagged; }
     bool isRemovable() const { return removable; }
@@ -31,6 +33,8 @@ private:
     int speed;
     bool tagged;
     bool removable;
+    Mix_Chunk* tagSound;
+    
 
     // Add renderer as a member
     SDL_Renderer* renderer;
