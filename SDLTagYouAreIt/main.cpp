@@ -8,7 +8,7 @@
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
-const int FRAME_RATE = 80;
+const int FRAME_RATE = 60;              // Reduced to 60 FPS for smoother animation
 const int FRAME_DELAY = 1000 / FRAME_RATE;
 const int NUM_NPCS = 10;
 
@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
     // Initialize SDL_ttf
     if (TTF_Init() == -1) {
         std::cerr << "Failed to initialize SDL_ttf: " << TTF_GetError() << std::endl;
+        SDL_Quit();
         return 1;
     }
 
@@ -53,6 +54,9 @@ int main(int argc, char* argv[]) {
     TTF_Font* font = TTF_OpenFont("../Assets/Fonts/arial.ttf", 24);
     if (!font) {
         std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
         return 1;
     }
 
@@ -63,9 +67,13 @@ int main(int argc, char* argv[]) {
     bool running = true;
     SDL_Event event;
 
+    // Debugging variables
+    int frameCount = 0;
+    auto lastSecond = std::chrono::high_resolution_clock::now();
+
     // Game loop
     while (running) {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto frameStart = std::chrono::high_resolution_clock::now();
 
         // Handle events
         while (SDL_PollEvent(&event)) {
@@ -97,23 +105,40 @@ int main(int argc, char* argv[]) {
                 }
             }
 
+            // Pass the event to the player for movement controls
             level.getPlayer()->handleEvent(event);
         }
 
-        level.update(FRAME_DELAY / 1000.0f);
+        // Update the game state
+        float deltaTime = FRAME_DELAY / 1000.0f;
+        level.update(deltaTime);
+
+        // Check if the game is over
         if (level.isGameOver()) {
             running = false;
         }
 
+        // Render the game
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         level.render(renderer, font);
         SDL_RenderPresent(renderer);
 
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<float, std::milli> elapsed = end - start;
-        if (elapsed.count() < FRAME_DELAY) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(FRAME_DELAY) - elapsed);
+        // Frame delay logic
+        auto frameEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float, std::milli> frameDuration = frameEnd - frameStart;
+        if (frameDuration.count() < FRAME_DELAY) {
+            SDL_Delay(static_cast<int>(FRAME_DELAY - frameDuration.count()));
+        }
+
+        // Debug: Track frames per second (FPS)
+        frameCount++;
+        auto currentSecond = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> elapsedSecond = currentSecond - lastSecond;
+        if (elapsedSecond.count() >= 1.0f) {
+            std::cout << "FPS: " << frameCount << std::endl;
+            frameCount = 0;
+            lastSecond = currentSecond;
         }
     }
 

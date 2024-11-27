@@ -148,13 +148,19 @@ copy /Y "$(SolutionDir)External\SDL2_mixer-2.8.0\lib\x64\SDL2_mixer.dll" "$(Targ
     <ClCompile Include="NPC.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SDLTagYouAreIt.cpp" />
+    <ClCompile Include="SpriteAnim.cpp" />
+    <ClCompile Include="SpriteSheet.cpp" />
+    <ClCompile Include="TGAReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Level.h" />
     <ClInclude Include="NPC.h" />
     <ClInclude Include="ObjectPool.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SpriteAnim.h" />
+    <ClInclude Include="SpriteSheet.h" />
     <ClInclude Include="StackAllocator.h" />
+    <ClInclude Include="TGAReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
